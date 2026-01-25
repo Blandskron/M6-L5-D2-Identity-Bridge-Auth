@@ -1,0 +1,92 @@
+# AI discovery & project overview file
+# https://llmstxt.org (community convention)
+
+project: Identity Platform – Django IdP + FastAPI Gateway
+owner: Blandskron SpA
+author: Bastián Landskron
+year: 2026
+license: MIT
+
+summary:
+This repository contains an internal identity and authentication platform.
+It combines a Django-based Identity Provider (session + CSRF, no JWT)
+with a FastAPI Gateway that issues JWT access/refresh tokens while
+validating the real session against Django.
+
+primary-language:
+- Python
+
+frameworks:
+- Django
+- Django REST Framework
+- FastAPI
+
+architecture:
+- Monorepo
+- Docker Compose
+- Microservices
+- Session-based authentication (Django)
+- JWT Gateway (RS256)
+
+services:
+- django-idp:
+    role: Identity Provider (source of truth)
+    auth: session cookies + CSRF
+    database: PostgreSQL
+    endpoints:
+      - /api/auth/login
+      - /api/auth/register
+      - /api/auth/me
+      - /api/auth/logout
+      - /api/auth/csrf
+
+- fastapi-gateway:
+    role: Authentication Gateway
+    auth: JWT (access + refresh)
+    validation: refresh requires active Django session
+    endpoints:
+      - /api/v1/login
+      - /api/v1/register
+      - /api/v1/me
+      - /api/v1/refresh
+      - /api/v1/logout
+
+security-model:
+- Django sessions are the source of truth
+- JWT is derived, not authoritative
+- Refresh token requires:
+  - valid JWT
+  - active Django session
+  - matching user identity
+- Logout revokes the session centrally
+
+cookies:
+- sessionid (HttpOnly)
+- csrftoken
+
+jwt:
+- algorithm: RS256
+- issuer: fastapi-gateway
+- audience: clients
+- signed-by: private key (gateway)
+
+documentation:
+- README.md        : high-level overview
+- DOCS.md          : detailed technical documentation
+- docker-compose.yml : full local stack
+
+intended-use:
+- Internal platforms
+- Educational environments
+- Corporate / B2B architectures
+- Not a public OAuth provider
+
+not-included:
+- OAuth2 / OpenID Connect
+- Public user CRUD
+- JWT-only authentication
+- Public SaaS auth flows
+
+contact:
+- company: Blandskron SpA
+- maintainer: Bastián Landskron
