@@ -1,0 +1,89 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: identity-postgres
+    restart: unless-stopped
+    networks:
+      - identity_net
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-identity_db}
+      POSTGRES_USER: ${POSTGRES_USER:-identity_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-identity_pass}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} -h localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  django-idp:
+    build:
+      context: ../django-idp
+    container_name: django-idp
+    ports:
+      - "8000:8000"
+    networks:
+      - identity_net
+    restart: unless-stopped
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    # Variables base del proyecto + DB
+    env_file:
+      - ../django-idp/.env
+
+    # Flags de arranque (entrypoint)
+    environment:
+      DJANGO_CREATE_SUPERUSER: "1"
+      DJANGO_SUPERUSER_USERNAME: "admin"
+      DJANGO_SUPERUSER_EMAIL: "admin@local"
+      DJANGO_SUPERUSER_PASSWORD: "admin1234"
+      DJANGO_COLLECTSTATIC: "1"
+      DJANGO_MAKEMIGRATIONS: "0"
+
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8000/api/schema/ > /dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+  fastapi-gateway:
+    build:
+      context: ../fastapi-gateway
+    container_name: fastapi-gateway
+    ports:
+      - "8001:8000"
+    networks:
+      - identity_net
+    restart: unless-stopped
+
+    depends_on:
+      django-idp:
+        condition: service_healthy
+
+    env_file:
+      - ../fastapi-gateway/.env
+
+    volumes:
+      - ../fastapi-gateway/keys:/app/keys:ro
+
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8000/docs > /dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+networks:
+  identity_net:
+    driver: bridge
+
+volumes:
+  pgdata:
