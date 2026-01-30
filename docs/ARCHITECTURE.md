@@ -126,4 +126,3 @@ Diseño preparado para:
 
 > **La sesión manda.  
 El token obedece.**
-```

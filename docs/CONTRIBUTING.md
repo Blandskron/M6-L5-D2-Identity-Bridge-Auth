@@ -109,4 +109,3 @@ Antes de enviar PR:
 
 Al contribuir, aceptas que tu código se libere bajo la
 licencia del proyecto (MIT).
-```

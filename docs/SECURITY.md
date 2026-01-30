@@ -125,4 +125,3 @@ Recomendado en PROD:
 - SSO externo
 
 (Se pueden agregar, pero no forman parte del diseño base)
-```
