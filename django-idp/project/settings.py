@@ -24,7 +24,7 @@ load_dotenv(BASE_DIR / ".env")
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-insecure-secret-key")
-DEBUG = True
+DEBUG = os.getenv("DJANGO_DEBUG", "1") == "1"
 
 ALLOWED_HOSTS = [h.strip() for h in os.getenv("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",") if h.strip()]
 
@@ -91,13 +91,24 @@ WSGI_APPLICATION = 'project.wsgi.application'
 # Database (PostgreSQL por env; fallback a SQLite)
 DB_ENGINE = os.getenv("DB_ENGINE", "sqlite").lower()
 
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+if DB_ENGINE == "postgres":
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.getenv("POSTGRES_DB", "identity_db"),
+            "USER": os.getenv("POSTGRES_USER", "identity_user"),
+            "PASSWORD": os.getenv("POSTGRES_PASSWORD", "identity_pass"),
+            "HOST": os.getenv("POSTGRES_HOST", "postgres"),
+            "PORT": os.getenv("POSTGRES_PORT", "5432"),
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 
 
