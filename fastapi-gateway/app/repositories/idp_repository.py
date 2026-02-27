@@ -1,17 +1,23 @@
+"""Cliente HTTP para comunicarse con el Django Identity Provider."""
+
 import httpx
 from fastapi import HTTPException
 from app.core.config import get_settings
 
 
 class IdpRepository:
+    """Encapsula todas las llamadas hacia endpoints del IdP."""
+
     def __init__(self):
         self.settings = get_settings()
 
     def _url(self, path: str) -> str:
+        """Construye URL absoluta del IdP a partir de una ruta relativa."""
         return f"{self.settings.DJANGO_BASE_URL}{path}"
 
     @staticmethod
     def _extract_cookies(resp: httpx.Response) -> dict:
+        """Extrae cookies de sesión usadas por el flujo federado."""
         return {
             "sessionid": resp.cookies.get("sessionid"),
             "csrftoken": resp.cookies.get("csrftoken"),
@@ -65,6 +71,7 @@ class IdpRepository:
         return data["user"], self._extract_cookies(resp)
 
     async def me(self, client: httpx.AsyncClient, cookies: dict) -> dict:
+        """Valida sesión activa en IdP y retorna identidad."""
         resp = await client.get(self._url(self.settings.DJANGO_ME_URL), cookies=cookies)
 
         if resp.status_code == 401:
@@ -74,6 +81,7 @@ class IdpRepository:
         return resp.json()
 
     async def logout(self, client: httpx.AsyncClient, cookies: dict) -> tuple[dict, dict]:
+        """Solicita cierre de sesión en IdP."""
         resp = await client.post(self._url(self.settings.DJANGO_LOGOUT_URL), cookies=cookies)
 
         if resp.status_code == 401:

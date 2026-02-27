@@ -1,3 +1,5 @@
+"""Endpoint de introspección de identidad a partir de sesión activa."""
+
 from django.contrib.auth.models import User
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.response import Response
@@ -16,6 +18,7 @@ from ._identity_payload import _identity_payload
 @authentication_classes([])
 @permission_classes([])
 def me_view(request):
+    """Retorna identidad del usuario actualmente autenticado en sesión."""
     user_id = request.session.get("user_id")
     if not user_id:
         return Response({"detail": "No autenticado"}, status=status.HTTP_401_UNAUTHORIZED)

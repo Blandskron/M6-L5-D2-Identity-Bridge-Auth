@@ -1,3 +1,5 @@
+"""Endpoint para inicializar CSRF en integraciones basadas en sesión."""
+
 from django.middleware.csrf import get_token
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.response import Response
@@ -15,9 +17,6 @@ from ..serializers import CsrfResponseSerializer
 @authentication_classes([])
 @permission_classes([])
 def csrf_view(request):
-    """
-    Devuelve un CSRF token y deja preparado el seteo de cookie csrftoken.
-    Útil si vas a usar SessionAuthentication/CSRF desde otro servicio.
-    """
+    """Devuelve un CSRF token y prepara el seteo de `csrftoken` vía cookie."""
     token = get_token(request)
     return Response({"csrfToken": token}, status=status.HTTP_200_OK)

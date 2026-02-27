@@ -196,6 +196,13 @@ Cuando el cliente llama `/refresh`:
 
 ---
 
+
+## 📚 Documentación adicional
+
+Además de los README por servicio, se agregó un análisis técnico consolidado para mantenimiento y evolución:
+
+- `docs/REPO_ANALISIS_TECNICO.md`
+
 ## 🐳 Docker Compose (orquestación)
 
 El archivo `docker-compose.yml` define:
