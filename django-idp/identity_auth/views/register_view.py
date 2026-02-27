@@ -1,3 +1,5 @@
+"""Endpoint de registro de usuarios para el Identity Provider."""
+
 from django.contrib.auth.models import User, Group
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.response import Response
@@ -17,6 +19,7 @@ from ._identity_payload import _identity_payload
 @authentication_classes([])
 @permission_classes([])
 def register_view(request):
+    """Crea usuarios locales en Django y los asocia al grupo inicial `user`."""
     serializer = RegisterRequestSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
 
@@ -29,6 +32,7 @@ def register_view(request):
 
     user = User.objects.create_user(username=username, email=email, password=password)
 
+    # Grupo por defecto para disponer de una base uniforme de autorización.
     group, _ = Group.objects.get_or_create(name="user")
     user.groups.add(group)
 

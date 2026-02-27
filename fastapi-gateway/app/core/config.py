@@ -1,3 +1,5 @@
+"""Configuración central del gateway basada en variables de entorno."""
+
 from functools import lru_cache
 from pydantic_settings import BaseSettings
 from pathlib import Path
@@ -7,6 +9,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 class Settings(BaseSettings):
+    """Settings tipados para URLs del IdP y parámetros JWT."""
+
     DJANGO_BASE_URL: str = "http://127.0.0.1:8000"
 
     DJANGO_CSRF_URL: str = "/api/auth/csrf/"
@@ -15,7 +19,6 @@ class Settings(BaseSettings):
     DJANGO_ME_URL: str = "/api/auth/me/"
     DJANGO_LOGOUT_URL: str = "/api/auth/logout/"
 
-    # JWT (como ya tenías)
     JWT_PRIVATE_KEY_PATH: str = str(BASE_DIR / "keys" / "jwt_private.pem")
     JWT_ALGORITHM: str = "RS256"
     JWT_ISSUER: str = "fastapi-gateway"
@@ -30,4 +33,5 @@ class Settings(BaseSettings):
 
 @lru_cache
 def get_settings() -> Settings:
+    """Devuelve una instancia cacheada para evitar relecturas de entorno."""
     return Settings()

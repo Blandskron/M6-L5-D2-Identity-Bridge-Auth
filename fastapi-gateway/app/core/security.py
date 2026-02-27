@@ -1,3 +1,5 @@
+"""Utilidades de seguridad: creación y validación de JWT para el gateway."""
+
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from jose import jwt, JWTError
@@ -8,10 +10,12 @@ settings = get_settings()
 
 
 def _private_key() -> str:
+    """Carga la clave privada usada para firmar tokens."""
     return Path(settings.JWT_PRIVATE_KEY_PATH).read_text()
 
 
 def _create_token(subject: str, claims: dict, expires_delta: timedelta) -> str:
+    """Construye un JWT firmado con claims base y claims de negocio."""
     now = datetime.now(timezone.utc)
     payload = {
         "sub": subject,
@@ -25,6 +29,7 @@ def _create_token(subject: str, claims: dict, expires_delta: timedelta) -> str:
 
 
 def create_access_token(subject: str, claims: dict) -> str:
+    """Genera access token de corta duración."""
     return _create_token(
         subject,
         claims,
@@ -33,6 +38,7 @@ def create_access_token(subject: str, claims: dict) -> str:
 
 
 def create_refresh_token(subject: str, claims: dict) -> str:
+    """Genera refresh token de larga duración."""
     return _create_token(
         subject,
         claims,
@@ -41,10 +47,11 @@ def create_refresh_token(subject: str, claims: dict) -> str:
 
 
 def decode_refresh_token(token: str) -> dict:
+    """Valida refresh token y devuelve su payload decodificado."""
     try:
         return jwt.decode(
             token,
-            _private_key(),  # para RS256 idealmente usar PUBLIC KEY, pero mantengo tu enfoque
+            _private_key(),  # Nota: para RS256 idealmente verificar con public key.
             algorithms=[settings.JWT_ALGORITHM],
             audience=settings.JWT_AUDIENCE,
             issuer=settings.JWT_ISSUER,

@@ -1,7 +1,10 @@
+"""Serialización interna del árbol de identidad de Django."""
+
 from django.contrib.auth.models import User
 
 
 def _identity_payload(user: User):
+    """Construye el payload de identidad usado por login/register/me."""
     return {
         "id": user.id,
         "username": user.username,

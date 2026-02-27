@@ -1,3 +1,5 @@
+"""Rutas públicas del módulo de autenticación del IdP."""
+
 from django.urls import path
 from .views import csrf_view, login_view, logout_view, register_view, me_view
 
