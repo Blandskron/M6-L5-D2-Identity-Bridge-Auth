@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Recursos protegidos{% endblock %}
+{% block content %}
+<h1>Recursos protegidos</h1>
+<p>Esta vista requiere una sesión válida. Crear y publicar requieren permisos diferentes.</p>
+{% for resource in resources %}
+  <article class="card">
+    <h2>{{ resource.title }}</h2>
+    <p>{{ resource.description }}</p>
+    <small>Autor: {{ resource.created_by.username }} · {% if resource.is_published %}Publicado{% else %}Borrador{% endif %}</small>
+    {% if not resource.is_published and perms.identity_auth.publish_educationalresource %}
+      <a class="button" href="{% url 'resource-publish' resource.pk %}">Publicar</a>
+    {% endif %}
+  </article>
+{% empty %}<p>No hay recursos todavía.</p>{% endfor %}
+{% endblock %}

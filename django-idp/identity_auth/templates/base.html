@@ -1,0 +1,29 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Identity Bridge{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'identity_auth/styles.css' %}">
+</head>
+<body>
+  <header>
+    <a class="brand" href="{% url 'home' %}">Identity Bridge</a>
+    <nav>
+      {% if user.is_authenticated %}
+        <a href="{% url 'resource-list' %}">Recursos</a>
+        {% if perms.identity_auth.add_educationalresource %}<a href="{% url 'resource-create' %}">Crear</a>{% endif %}
+        <a href="{% url 'admin:index' %}">Administración</a>
+        <form action="{% url 'logout' %}" method="post">{% csrf_token %}<button type="submit">Cerrar sesión</button></form>
+      {% else %}
+        <a href="{% url 'login' %}">Iniciar sesión</a>
+      {% endif %}
+    </nav>
+  </header>
+  <main>
+    {% for message in messages %}<p class="message">{{ message }}</p>{% endfor %}
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

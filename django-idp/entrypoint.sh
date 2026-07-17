@@ -12,6 +12,7 @@ fi
 # Migraciones
 echo "Running migrations..."
 python manage.py migrate --noinput
+python manage.py setup_auth_demo
 
 # (Opcional) makemigrations automático (NO recomendado en producción)
 if [ "${DJANGO_MAKEMIGRATIONS:-0}" = "1" ]; then
@@ -27,7 +28,7 @@ if [ "${DJANGO_COLLECTSTATIC:-1}" = "1" ]; then
 fi
 
 # Crear superuser si vienen variables
-if [ "${DJANGO_CREATE_SUPERUSER:-0}" = "1" ]; then
+if [ "${DJANGO_CREATE_SUPERUSER:-1}" = "1" ]; then
   echo "Ensuring superuser exists..."
   python manage.py shell << 'PY'
 import os

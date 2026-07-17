@@ -1,6 +1,6 @@
 """Endpoint de autenticación por sesión del Identity Provider."""
 
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.response import Response
 from rest_framework import status
@@ -34,8 +34,8 @@ def login_view(request):
     if not user.is_active:
         return Response({"detail": "Usuario inactivo"}, status=status.HTTP_403_FORBIDDEN)
 
-    # Persistimos en sesión el identificador canónico para endpoints posteriores.
-    request.session["user_id"] = user.id
+    # login() guarda el backend y el id de usuario con el modelo Auth oficial.
+    login(request._request, user)
 
     return Response(
         {"user": _identity_payload(user), "session_active": True},

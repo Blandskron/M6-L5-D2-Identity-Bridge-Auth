@@ -1,0 +1,39 @@
+services:
+  django-idp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "${DJANGO_PORT:-8000}:8000"
+    environment:
+      DJANGO_ALLOWED_HOSTS: "localhost,127.0.0.1,django-idp"
+      DJANGO_CREATE_SUPERUSER: "1"
+      DJANGO_SUPERUSER_USERNAME: "admin"
+      DJANGO_SUPERUSER_EMAIL: "admin@example.com"
+      DJANGO_SUPERUSER_PASSWORD: "admin1234"
+      SQLITE_PATH: "/data/db.sqlite3"
+    volumes:
+      - django_data:/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+  fastapi-gateway:
+    build:
+      context: ./fastapi-gateway
+    ports:
+      - "${GATEWAY_PORT:-8001}:8000"
+    environment:
+      DJANGO_BASE_URL: "http://django-idp:8000"
+      JWT_PRIVATE_KEY_PATH: "/app/keys/jwt_private.pem"
+    volumes:
+      - ./fastapi-gateway/keys:/app/keys:ro
+    depends_on:
+      django-idp:
+        condition: service_healthy
+
+volumes:
+  django_data:

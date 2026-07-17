@@ -4,6 +4,7 @@ from rest_framework.decorators import api_view, permission_classes, authenticati
 from rest_framework.response import Response
 from rest_framework import status
 from drf_spectacular.utils import extend_schema
+from django.contrib.auth import logout
 
 from ..serializers import LogoutResponseSerializer
 
@@ -17,5 +18,5 @@ from ..serializers import LogoutResponseSerializer
 @permission_classes([])
 def logout_view(request):
     """Elimina completamente la sesión del cliente autenticado."""
-    request.session.flush()
+    logout(request._request)
     return Response({"logged_out": True}, status=status.HTTP_200_OK)

@@ -1,0 +1,3 @@
+{% extends "base.html" %}
+{% block title %}Publicar recurso{% endblock %}
+{% block content %}<section class="card narrow"><h1>Publicar “{{ object.title }}”</h1><p>Esta acción exige el permiso personalizado <code>publish_educationalresource</code>.</p><form method="post">{% csrf_token %}<button type="submit">Confirmar publicación</button></form></section>{% endblock %}

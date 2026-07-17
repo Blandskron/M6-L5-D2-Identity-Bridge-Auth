@@ -20,7 +20,10 @@ from django.urls import path, include
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-
+    # LoginView y LogoutView oficiales de Django. Las plantillas viven en
+    # identity_auth/templates/registration/.
+    path("accounts/", include("django.contrib.auth.urls")),
+    path("", include("identity_auth.web_urls")),
     path("api/", include("identity_docs.urls")),
     path("api/auth/", include("identity_auth.urls")),
 ]

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Inicio | Identity Bridge{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>Demostración de autenticación y autorización</h1>
+  <p>Este módulo utiliza el modelo Auth de Django: usuarios, sesiones, permisos y grupos.</p>
+  {% if user.is_authenticated %}
+    <p>Sesión activa como <strong>{{ user.username }}</strong>.</p>
+    <a class="button" href="{% url 'resource-list' %}">Ver recursos protegidos</a>
+  {% else %}
+    <p>Inicia sesión para acceder al recurso protegido con <code>LoginRequiredMixin</code>.</p>
+    <a class="button" href="{% url 'login' %}">Iniciar sesión</a>
+  {% endif %}
+</section>
+{% endblock %}
